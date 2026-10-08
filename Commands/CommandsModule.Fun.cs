@@ -1,4 +1,5 @@
 using NetCord.Services.ApplicationCommands;
+using 
 
 namespace JimmyRewrite.Commands;
 
@@ -56,5 +57,10 @@ public partial class CommandsModule
 
             return returnValue;
         }
+    }
+
+    [SlashCommand("", "")]
+    public static string Cat() {
+        return 
     }
 }
