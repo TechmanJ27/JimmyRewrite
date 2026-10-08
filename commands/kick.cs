@@ -9,8 +9,9 @@ using NetCord.Hosting.Services;
 using NetCord.Hosting.Services.ApplicationCommands;
 using NetCord.Rest;
 
-public class KickCommand: ApplicationCommandModule<SlashCommandContext> {
-  [SlashCommand("kick", "kick a user from the server")]
+public partial CommandModule {
+  [SlashCommand("kick", "kick a user from the server", 
+  DefaultGuildPermissions = Permissions.KickUsers)]
   public async Task<string> Power(
       [SlashCommandParameter(Name = "user", Description = "The user to kick")] GuildUser targetUser,
       [SlashCommandParameter(Name = "reason", Description = "The reason for the kick")] string kickReason) {
