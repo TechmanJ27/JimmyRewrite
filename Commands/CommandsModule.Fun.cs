@@ -60,8 +60,8 @@ public partial class CommandsModule
         }
     }
 
-    [SlashCommand("", "")]
+    [SlashCommand("cat", "Get a random cat gif")]
     public static string Cat() {
-        return 
+        return FetchGIF("cat", );
     }
 }
