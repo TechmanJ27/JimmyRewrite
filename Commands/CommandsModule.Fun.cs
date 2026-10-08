@@ -1,5 +1,6 @@
 using NetCord.Services.ApplicationCommands;
-using 
+using GifService;
+using GifService.FetchGIF;
 
 namespace JimmyRewrite.Commands;
 
