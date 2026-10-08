@@ -1,16 +1,38 @@
+using System.Reflection;
 using Microsoft.Data.Sqlite;
 
-namespace JimmyRewrite;
+namespace JimmyRewrite.Database;
 
-public class Database
+public static class Database
 {
-    public const string ConnectionString = "Data Source=jimmy.db;";
+    private const string ConnectionString = "Data Source=jimmy.db;";
+    private const int DatabaseVersion = 1;
 
-    public Database()
+    private static SqliteConnection GetOpenedSqliteConnection()
     {
-        using var connection = new SqliteConnection(ConnectionString);
+        var newConnection = new SqliteConnection(ConnectionString);
+        newConnection.Open();
         
-        connection.Open();
+        using var command = GetSqliteCommand("JimmyRewrite.Database.Statements.CheckVersion.sql", newConnection);
+        var version = (int)command.ExecuteScalar()!;
+        if (version != DatabaseVersion) throw new Exception("Database version mismatch!");
         
+        using var command2 = GetSqliteCommand("JimmyRewrite.Database.Statements.Init.sql", newConnection);
+        command2.Parameters.AddWithValue("DatabaseVersion", DatabaseVersion);
+        command2.ExecuteNonQuery();
+        
+        return newConnection;
     }
+
+    private static SqliteCommand GetSqliteCommand(string scriptManifestResourceName, SqliteConnection connection)
+    {
+        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(scriptManifestResourceName);
+        if (stream == null) throw new Exception("Could not find database statements!");
+        using var reader = new StreamReader(stream);
+        var sql = reader.ReadToEnd();
+        
+        return new SqliteCommand(sql, connection);
+    }
+    
+    
 }
