@@ -11,6 +11,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Data.Sqlite" Version="11.0.0-rc.1.26425.128" />
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="11.0.0-rc.1.26425.128" />
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0-rc.1.26425.128" />
       <PackageReference Include="NetCord" Version="1.0.0-beta.28" />
       <PackageReference Include="NetCord.Hosting" Version="1.0.0-beta.28" />
@@ -19,7 +20,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Commands\Guild\" />
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Database\Statements\**\*" />
     </ItemGroup>
 
 </Project>

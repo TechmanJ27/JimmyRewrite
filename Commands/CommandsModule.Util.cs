@@ -1,10 +1,8 @@
-using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 
-namespace JimmyRewrite.Commands.Global;
+namespace JimmyRewrite.Commands;
 
 public partial class CommandsModule
 {
@@ -16,7 +14,7 @@ public partial class CommandsModule
         var userToGet = user ?? Context.User;
         
         var embed = new EmbedProperties()
-            .WithTitle($"{userToGet.Username}'s Avatar")
+            .WithTitle($"{userToGet.GlobalName ?? userToGet.Username}'s Avatar")
             .WithImage(new EmbedImageProperties($"{userToGet.GetAvatarUrl() ?? userToGet.DefaultAvatarUrl}"));
         
         var messageProperties = new InteractionMessageProperties()

@@ -1,6 +1,6 @@
 using NetCord.Services.ApplicationCommands;
 
-namespace JimmyRewrite.Commands.Global;
+namespace JimmyRewrite.Commands;
 
 public partial class CommandsModule
 {

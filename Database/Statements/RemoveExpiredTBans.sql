@@ -1,0 +1,1 @@
+DELETE FROM tbans WHERE expire < @Time RETURNING gid, uid;

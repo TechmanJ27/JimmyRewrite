@@ -1,12 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 
-namespace JimmyRewrite.Commands.Global;
+namespace JimmyRewrite.Commands;
 
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public partial class CommandsModule : ApplicationCommandModule<ApplicationCommandContext>
 {
     [SlashCommand("ping", "Ping always comes with a pong!")]

@@ -1,4 +1,3 @@
-PRAGMA user_version = @DatabaseVersion;
 PRAGMA journal_mode = WAL;
 PRAGMA foreign_keys = ON;
 PRAGMA synchronous = NORMAL;
@@ -25,11 +24,13 @@ CREATE TABLE IF NOT EXISTS rules (
 CREATE TABLE IF NOT EXISTS conf (
     gid INTEGER PRIMARY KEY,
     message INTEGER,
-    member INTEGER,
-    join_leave INTEGER,
+    welcome INTEGER,
     watch INTEGER,
     mod INTEGER,
-    appeal TEXT,
+    appeal_link TEXT,
+    force_note INTEGER NOT NULL DEFAULT 0,
+    allow_custom_rule INTEGER NOT NULL DEFAULT 0,
+    mod_action_confirm INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (gid) REFERENCES guild_dat (gid) ON DELETE CASCADE
 ) STRICT;
 
@@ -38,11 +39,11 @@ CREATE TABLE IF NOT EXISTS cases (
     gid INTEGER NOT NULL,
     uid INTEGER NOT NULL,
     type INTEGER NOT NULL,
+    rid TEXT NOT NULL,
     rule_title TEXT NOT NULL,
-    rule_desc TEXT,
-    mess_id INTEGER,
     mod_uid INTEGER NOT NULL,
     note TEXT,
+    mod_note TEXT,
     time INTEGER NOT NULL,
     tban_expire INTEGER,
     PRIMARY KEY (id, gid),
@@ -52,7 +53,6 @@ CREATE TABLE IF NOT EXISTS cases (
 CREATE TABLE IF NOT EXISTS tbans (
     gid INTEGER NOT NULL,
     uid INTEGER NOT NULL,
-    cid INTEGER NOT NULL,
     expire INTEGER NOT NULL,
     PRIMARY KEY (gid, uid),
     FOREIGN KEY (gid) REFERENCES guild_dat (gid) ON DELETE CASCADE
@@ -76,3 +76,5 @@ CREATE TABLE IF NOT EXISTS member_links (
     FOREIGN KEY (uid, gid) REFERENCES members (uid, gid) ON DELETE CASCADE,
     FOREIGN KEY (link_uid, gid) REFERENCES members (uid, gid) ON DELETE CASCADE
 ) STRICT;
+
+PRAGMA user_version = @DatabaseVersion;
