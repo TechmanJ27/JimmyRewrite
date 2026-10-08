@@ -18,7 +18,7 @@ public partial class CommandsModule
         int rolls = 1
         )
     {
-        var results = new int[sides];
+        var results = new int[rolls];
         for (var i = 0; i < rolls; i++)
         {
             results[i] = Random.Shared.Next(1, sides);
@@ -35,14 +35,14 @@ public partial class CommandsModule
             
             var heads = results.Count(x => x == (int)CoinSides.Heads);
             var tails = results.Count(x => x == (int)CoinSides.Tails);
-            return $"> {string.Join(", ", IsHeadOrTailsShort(results))}\n" +
-                   $":coin: total: {sum} | heads: {heads} | tails: {tails}";
+            return $"> **{string.Join(", ", IsHeadOrTailsShort(results))}**\n" +
+                   $":coin: total: **{sum}** | heads: **{heads}** | tails: **{tails}**";
         }
 
-        if (rolls <= 1) return $":game_die: You rolled a {results[0]}!";
+        if (rolls <= 1) return $":game_die: You rolled a **{results[0]}**!";
         
-        return $"> {string.Join(", ", results)}\n" +
-               $":game_die: total: {sum} | min: {min} | max: {max} | avg: {avg} | {rolls}d{sides}";
+        return $"> **{string.Join(", ", results)}**\n" +
+               $":game_die: total: **{sum}** | min: **{min}** | max: **{max}** | avg: **{avg}** | **{rolls}d{sides}**";
 
         string IsHeadOrTails(int value) => value == (int)CoinSides.Heads ? "Head" : "Tails";
 
