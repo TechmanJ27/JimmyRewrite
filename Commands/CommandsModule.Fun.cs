@@ -62,6 +62,6 @@ public partial class CommandsModule
 
     [SlashCommand("cat", "Get a random cat gif")]
     public static string Cat() {
-        return FetchGIF("cat", );
+        return FetchGIF("cat", Context.User);
     }
 }
