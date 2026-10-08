@@ -1,15 +1,48 @@
 using System.Net.Http.Headers
 using System.Threading.Tasks
 
-Task fetchGIF(String query) {
-  var client = new HttpClient();
-  var request = new HttpRequestMessage(HttpMethod.Get, "https://api.klipy.com/api/v1/{app_key}/gifs/search?page={page}&per_page={per_page}&q={q}&customer_id={customer_id}&locale={country_code}&content_filter={content_filter}");
-  var content = new StringContent(string.Empty);
-  content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-  request.Content = content;
-  var response = await client.SendAsync(request);
-  response.EnsureSuccessStatusCode();
-  const jsonString = await response.Content.ReadAsStringAsync());
-   = JsonSerializer.Deserialize<User>(jsonString);
-   
+public class KlipyResponse
+{
+    public KlipyData Data { get; set; }
+}
+
+public class KlipyData
+{
+    public KlipyGif[] Results { get; set; }
+}
+
+public class KlipyGif
+{
+    public string Id { get; set; }
+    public string Title { get; set; }
+    public string Url { get; set; }
+    // Add other fields you need from the API response here
+}
+
+public class GifService
+{
+    
+    private static readonly HttpClient client = new HttpClient();
+    
+    public async Task FetchGIF(string query) {
+    
+        string apiKey = "YOUR_APP_KEY"; 
+        string customerId = "YOUR_CUSTOMER_ID";
+        string page = "1";
+        string perPage = "10";
+        string countryCode = "en";
+        string contentFilter = "off";
+        
+        string url = $"https://api.klipy.com/api/v1/{apiKey}/gifs/search?page={page}&per_page={perPage}&q={Uri.EscapeDataString(query)}&customer_id={customerId}&locale={countryCode}&content_filter={contentFilter}";
+        
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+    
+        var response = await client.SendAsync(request);    
+        response.EnsureSuccessStatusCode();
+        string jsonString = await response.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        KlipyResponse result = JsonSerializer.Deserialize<KlipyResponse>(jsonString, options);
+    
+        return result;
+    }
 }
