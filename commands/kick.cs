@@ -1,7 +1,6 @@
 using System;
 using System.Text;
 using System.Data;
-using System.Data.SQLite;
 
 using NetCord;
 using NetCord.Hosting.Gateway;
