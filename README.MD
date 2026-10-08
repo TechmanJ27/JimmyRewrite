@@ -8,3 +8,7 @@ Make `appsettings.json` file in the same folder as the binary and put your token
   }
 }
 ```
+
+## Plan
+- [ ] Better README.MD
+- [ ] `/config set` - Conveniences command that allows for a more user-friendly way of configuring.

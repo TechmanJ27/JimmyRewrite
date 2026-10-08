@@ -3,11 +3,11 @@ using NetCord.Hosting.Gateway;
 
 namespace JimmyRewrite.events;
 
-public class MessageCreateHandler() : IMessageCreateGatewayHandler
+public class MessageCreateHandler(GatewayClient client) : IMessageCreateGatewayHandler
 {
-    public ValueTask HandleAsync(Message message)
+    public ValueTask HandleAsync(Message arg)
     {
-        Console.WriteLine($"Message from {message.Author.Username}: {message.Content}");
+        MessageCacheManager.Get(arg.ChannelId, client.Rest).Add(arg);
         return default;
     }
 }
