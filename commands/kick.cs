@@ -9,7 +9,7 @@ using NetCord.Hosting.Services;
 using NetCord.Hosting.Services.ApplicationCommands;
 using NetCord.Rest;
 
-public partial CommandModule {
+public partial class CommandsModule {
   [SlashCommand("kick", "kick a user from the server", 
   DefaultGuildPermissions = Permissions.KickUsers)]
   public async Task<string> Power(
@@ -21,10 +21,6 @@ public partial CommandModule {
                 return user.Username;
             }
         try {
-            using var connection = new SqliteConnection(@"Data Source=db\database.db");
-            connection.Open();
-    
-            Console.WriteLine("Connected to the SQLite database!");
             await targetUser.KickAsync(new RestRequestProperties().WithAuditLogReason(kickReason));
             return User() + " has kicked " + targetUser.Username + " for: " + kickReason;
         } catch (Exception e) {
