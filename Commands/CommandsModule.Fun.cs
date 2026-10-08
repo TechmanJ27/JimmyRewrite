@@ -61,11 +61,10 @@ public partial class CommandsModule
     }
 
     [SlashCommand("gif", "Get a random gif from the chosen category")]
-    
-    [SlashCommand("cat", "Get a random cat gif")]
-    public static string Cat() {
-        return FetchGIF("cat", Context.User);
-    }
+    [SubSlashCommand("cat", "Get a random cat gif")]
+        public static string Cat() {
+            return FetchGIF("cat", Context.User);
+        }
 
     [SlashCommand("dog", "Get a random dog gif")]
     public static string Dog() {
