@@ -64,4 +64,14 @@ public partial class CommandsModule
     public static string Cat() {
         return FetchGIF("cat", Context.User);
     }
+
+    [SlashCommand("dog", "Get a random dog gif")]
+    public static string Dog() {
+        return FetchGIF("dog", Context.User);
+    }
+
+    [SlashCommand("cat", "Get a random boykisser gif")]
+    public static string Cat() {
+        return FetchGIF("boykisser", Context.User);
+    }
 }
