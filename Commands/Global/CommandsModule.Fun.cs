@@ -21,7 +21,7 @@ public partial class CommandsModule
         var results = new int[rolls];
         for (var i = 0; i < rolls; i++)
         {
-            results[i] = Random.Shared.Next(1, sides);
+            results[i] = Random.Shared.Next(1, sides + 1);
         }
         
         var min = results.Min();
