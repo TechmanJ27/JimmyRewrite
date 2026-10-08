@@ -23,14 +23,14 @@ public class GifService
     
     private static readonly HttpClient client = new HttpClient();
     
-    public async Task FetchGIF(string query) {
+    public async Task FetchGIF(string query, User user) {
     
-        string apiKey = "YOUR_APP_KEY"; 
-        string customerId = "YOUR_CUSTOMER_ID";
+        string apiKey = $"{add api key as secret}"; 
+        string customerId = user.id;
         string page = "1";
         string perPage = "10";
         string countryCode = "en";
-        string contentFilter = "off";
+        string contentFilter = "on";
         
         string url = $"https://api.klipy.com/api/v1/{apiKey}/gifs/search?page={page}&per_page={perPage}&q={Uri.EscapeDataString(query)}&customer_id={customerId}&locale={countryCode}&content_filter={contentFilter}";
         
