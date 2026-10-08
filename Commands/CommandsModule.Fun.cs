@@ -60,6 +60,8 @@ public partial class CommandsModule
         }
     }
 
+    [SlashCommand("gif", "Get a random gif from the chosen category")]
+    
     [SlashCommand("cat", "Get a random cat gif")]
     public static string Cat() {
         return FetchGIF("cat", Context.User);
@@ -70,8 +72,8 @@ public partial class CommandsModule
         return FetchGIF("dog", Context.User);
     }
 
-    [SlashCommand("cat", "Get a random boykisser gif")]
-    public static string Cat() {
+    [SlashCommand("boykisser", "Get a random boykisser gif")]
+    public static string Boykisser() {
         return FetchGIF("boykisser", Context.User);
     }
 }
