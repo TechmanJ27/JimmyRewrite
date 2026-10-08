@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 
@@ -17,17 +18,16 @@ public partial class CommandsModule : ApplicationCommandModule<ApplicationComman
     {
 
         var embed = new EmbedProperties()
-            .WithTitle("Jimmy")
             .WithFields([
                 new EmbedFieldProperties()
                     .WithName("About")
-                    .WithValue("This is a rewrite of Jimmy, a Discord bot written in C# using NetCord, " +
-                               "originally written in TypeScript by TheMonHub.\n" +
-                               "Jimmy (shortly Jim) is a multipurpose Discord bot with its main focus being moderation." +
-                               "It provides a variety of features for moderation, intending to be a better way to manage your server."),
+                    .WithValue("This is a rewrite of **Jimmy**, a Discord bot written in C# using [NetCord](https://netcord.dev/), " +
+                               "originally written in TypeScript by [TheMonHub](https:///themonhub.net).\n" +
+                               "**Jimmy** (*shortly Jim*) is a multipurpose Discord bot with its main focus being moderation." +
+                               "It provides a *variety of features* for moderation, intending to be a better way to manage your server."),
                 new EmbedFieldProperties()
                     .WithName("Version")
-                    .WithValue($"{Assembly.GetEntryAssembly()!.GetName().Version}"),
+                    .WithValue($"`{Assembly.GetEntryAssembly()!.GetName().Version}`"),
                 new EmbedFieldProperties()
                     .WithName("Source Code")
                     .WithValue("https://github.com/TheMonHub/JimmyRewrite")
