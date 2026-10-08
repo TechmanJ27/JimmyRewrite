@@ -16,7 +16,6 @@ public class KlipyGif
     public string Id { get; set; }
     public string Title { get; set; }
     public string Url { get; set; }
-    // Add other fields you need from the API response here
 }
 
 public class GifService
