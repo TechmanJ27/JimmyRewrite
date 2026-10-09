@@ -9,6 +9,8 @@ using NetCord.Rest;
 
 namespace JimmyRewrite;
 
+// TODO: Send DM to user after a punishment in LogTempUnban and LogCase
+
 public static class ModerationHandler
 {
     public enum PunishmentType
@@ -237,7 +239,6 @@ public static class ModerationHandler
             throw new NoRuleAllowedIsOff();
         }
         
-        // TODO: Check on command handling 
         var serverRulesCount = Database.Database.GetCurrentRuleId(guildId);
         if (rules.Any(rule => rule <= 0 || rule > serverRulesCount))
         {

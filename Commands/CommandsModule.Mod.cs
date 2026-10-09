@@ -278,5 +278,7 @@ public partial class CommandsModule
                 )
             );
         }
+        // TODO: The rest of the punishment commands
+        // TODO: View Cases with filter functionality, Etc
     }
 }

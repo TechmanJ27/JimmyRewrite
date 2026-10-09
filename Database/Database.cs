@@ -307,7 +307,7 @@ public static class Database
         return new Case(0, userId, type, ruleIds, ruleTitle, modUid, note, time, tBanExpire, image);
     }
     
-    // TODO: Add get caseS
+    // TODO: Add get cases for view cases
 
     public static List<(ulong GuildId, ulong UserId)> RemoveExpiredTBans()
     {
