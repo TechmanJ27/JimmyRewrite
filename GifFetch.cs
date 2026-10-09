@@ -25,7 +25,7 @@ public class GifService
     
     public async Task FetchGIF(string query, User user) {
     
-        string apiKey = $"{add api key as secret}"; 
+        string apiKey = KLIPY_API_KEY; 
         string customerId = user.id;
         string page = "1";
         string perPage = "10";
