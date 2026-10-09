@@ -11,7 +11,7 @@ namespace JimmyRewrite;
 
 internal static class Program
 {
-    public static ConfigurationManager ConfigManager = null!;
+    public static ConfigurationManager ConfigManager { get; private set; } = null!;
     public static async Task Main(string[] args)
     {
         var builder = Host.CreateApplicationBuilder(args);
@@ -31,6 +31,8 @@ internal static class Program
         builder.Services.AddGatewayHandler<GuildUserRemoveHandler>();
 
         builder.Services.AddHostedService<TempBanManager>();
+        
+        Console.WriteLine(Program.ConfigManager["Discord::Token"]);
 
         var host = builder.Build();
 
