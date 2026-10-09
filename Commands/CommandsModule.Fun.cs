@@ -1,6 +1,4 @@
 using NetCord.Services.ApplicationCommands;
-using GifService;
-using GifService.FetchGIF;
 
 namespace JimmyRewrite.Commands;
 
@@ -61,7 +59,7 @@ public partial class CommandsModule
     }
 
     [SlashCommand("gif", "Get a random gif from the chosen category")]
-    public partial class GIFModule : ApplicationCommandModule<ApplicationCommandContext> (IConfiguration config)
+    public partial class GIFModule : ApplicationCommandModule<ApplicationCommandContext>
     {
     [SubSlashCommand("cat", "Get a random cat gif")]
         public static string Cat() {
