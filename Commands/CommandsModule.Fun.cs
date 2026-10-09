@@ -61,7 +61,7 @@ public partial class CommandsModule
     }
 
     [SlashCommand("gif", "Get a random gif from the chosen category")]
-    public class GIFModule : ApplicationCommandModule<ApplicationCommandContext> 
+    public class GIFModule : ApplicationCommandModule<ApplicationCommandContext> (IConfiguration config)
     {
     [SubSlashCommand("cat", "Get a random cat gif")]
         public static string Cat() {
