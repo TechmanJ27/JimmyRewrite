@@ -15,7 +15,7 @@ public static class ModerationHandler
         Appeal = 5
     }
     
-    public static void LogConfigChange(ulong guildId, User who, string what, string? from, string to, RestClient restClient)
+    public static async Task LogConfigChange(ulong guildId, User who, string what, string? from, string to, RestClient restClient)
     {
         var modLogChannel = Database.Database.GetLogModChannel(guildId);
         if (modLogChannel == null)
@@ -42,7 +42,17 @@ public static class ModerationHandler
         
         var messageProperties = new MessageProperties().AddEmbeds(embed);
 
-        restClient.SendMessageAsync((ulong)modLogChannel, messageProperties);
+        try
+        {
+            await restClient.SendMessageAsync((ulong)modLogChannel, messageProperties);
+        }
+        catch (RestException e)
+        {
+            if (e.Error == null || e.Error.Code != 404 && e.Error.Code != 403)
+            {
+                throw;
+            }
+        }
     }
 
     public static async Task LogTempUnban(ulong guildId, ulong who, RestClient client)
@@ -67,7 +77,17 @@ public static class ModerationHandler
             .WithColor(Colors.Blue);
         
         var messageProperties = new MessageProperties().AddEmbeds(embed);
-        await client.SendMessageAsync((ulong)logModChannel, messageProperties);
+        try
+        {
+            await client.SendMessageAsync((ulong)logModChannel, messageProperties);
+        }
+        catch (RestException e)
+        {
+            if (e.Error == null || e.Error.Code != 404 && e.Error.Code != 403)
+            {
+                throw;
+            }
+        }
     }
 
     public static void BanUser(User user, int[] rule, int durationSecond, string? note, string? modNote)

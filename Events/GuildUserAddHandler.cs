@@ -18,6 +18,16 @@ public class GuildUserAddHandler(GatewayClient client) : IGuildUserAddGatewayHan
         var message = new MessageProperties()
             .WithContent($"<@{arg.Id}> ({arg.Username} | {arg.Id}) joined the server");
 
-        await client.Rest.SendMessageAsync((ulong)welcomeLog, message);
+        try
+        {
+            await client.Rest.SendMessageAsync((ulong)welcomeLog, message);
+        }
+        catch (RestException e)
+        {
+            if (e.Error == null || e.Error.Code != 404 && e.Error.Code != 403)
+            {
+                throw;
+            }
+        }
     }
 }
