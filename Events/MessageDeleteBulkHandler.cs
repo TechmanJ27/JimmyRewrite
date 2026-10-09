@@ -90,7 +90,17 @@ public class MessageDeleteBulkHandler(GatewayClient client) : IMessageDeleteBulk
 
         foreach (var message in messages)
         {
-            await client.Rest.SendMessageAsync((ulong)messageLog, message);
+            try
+            {
+                await client.Rest.SendMessageAsync((ulong)messageLog, message);
+            }
+            catch (RestException e)
+            {
+                if (e.Error == null || e.Error.Code != 404 && e.Error.Code != 403)
+                {
+                    throw;
+                }
+            }
         }
     }
 }

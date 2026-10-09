@@ -82,7 +82,17 @@ public class MessageDeleteHandler(GatewayClient client) : IMessageDeleteGatewayH
         ];
         
         var message = new MessageProperties().AddEmbeds(embed).WithContent(ToStringUtil.AttachmentsToString(deletedMessage.Attachments));
-        
-        await client.Rest.SendMessageAsync((ulong)messageLog, message);
+
+        try
+        {
+            await client.Rest.SendMessageAsync((ulong)messageLog, message);
+        }
+        catch (RestException e)
+        {
+            if (e.Error == null || e.Error.Code != 404 && e.Error.Code != 403)
+            {
+                throw;
+            }
+        }
     }
 }

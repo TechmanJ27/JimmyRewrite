@@ -17,6 +17,16 @@ public class GuildUserRemoveHandler(GatewayClient client) : IGuildUserRemoveGate
         var message = new MessageProperties()
             .WithContent($"<@{arg.User.Id}> ({arg.User.Username} | {arg.User.Id}) left the server\n");
 
-        await client.Rest.SendMessageAsync((ulong)welcomeLog, message);
+        try
+        {
+            await client.Rest.SendMessageAsync((ulong)welcomeLog, message);
+        }
+        catch (RestException e)
+        {
+            if (e.Error == null || e.Error.Code != 404 && e.Error.Code != 403)
+            {
+                throw;
+            }
+        }
     }
 }

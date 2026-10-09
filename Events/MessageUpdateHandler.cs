@@ -118,6 +118,16 @@ public class MessageUpdateHandler(GatewayClient client) : IMessageUpdateGatewayH
             
         var message = new MessageProperties().AddEmbeds(embed).WithContent(attachmentSummary);
             
-        await client.Rest.SendMessageAsync((ulong)messageLog, message);
+        try
+        {
+            await client.Rest.SendMessageAsync((ulong)messageLog, message);
+        }
+        catch (RestException e)
+        {
+            if (e.Error == null || e.Error.Code != 404 && e.Error.Code != 403)
+            {
+                throw;
+            }
+        }
     }
 }
