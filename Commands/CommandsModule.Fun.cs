@@ -69,6 +69,7 @@ public partial class CommandsModule
 
             HttpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://beta-api.thecatapi.com/v1/images/search");
 
+            string cat_key = config["GIFS:cat_key"];
             request.Headers.Add("x-api-key", cat_key);
 
             HttpResponseMessage response = await client.SendAsync(request);
