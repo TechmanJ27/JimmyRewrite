@@ -65,7 +65,17 @@ public partial class CommandsModule
     {
     [SubSlashCommand("cat", "Get a random cat gif")]
         public static string Cat() {
-            return FetchGIF("cat", Context.User);
+            HttpClient = new HttpClient();
+
+            HttpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://beta-api.thecatapi.com/v1/images/search");
+
+            request.Headers.Add("x-api-key", cat_key);
+
+            HttpResponseMessage response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            return responseBody.url;
         }
     }
 
@@ -73,7 +83,15 @@ public partial class CommandsModule
     {
     [SubSlashCommand("dog", "Get a random dog gif")]
         public static string Dog() {
-            return FetchGIF("dog", Context.User);
+            HttpClient = new HttpClient();
+            
+            HttpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://dog.ceo/api/breeds/image/random");
+
+            HttpResponseMessage response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            return responseBody.message;
         }
     }
 
