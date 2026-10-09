@@ -18,14 +18,14 @@ public class KlipyGif
     public string Url { get; set; }
 }
 
-public class GifService
+public class GifService(IConfiguration config)
 {
     
     private static readonly HttpClient client = new HttpClient();
     
     public async Task FetchGIF(string query, User user) {
     
-        string apiKey = KLIPY_API_KEY; 
+        string apiKey = config["Klipy:ApiKey"]; 
         string customerId = user.id;
         string page = "1";
         string perPage = "10";
