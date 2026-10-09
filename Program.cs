@@ -16,7 +16,6 @@ internal static class Program
     {
         var builder = Host.CreateApplicationBuilder(args);
         ConfigManager = builder.Configuration;
-        var KLIPY_API_KEY = Config["Klipy.Api_Key"];
         builder.Services.AddDiscordGateway(options =>
         {
             options.Intents = GatewayIntents.MessageContent | GatewayIntents.GuildMessages | GatewayIntents.GuildUsers;
