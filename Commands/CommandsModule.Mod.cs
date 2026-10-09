@@ -24,26 +24,4 @@ public partial class CommandsModule
             
         }
     }
-    public class ModModule : ApplicationCommandModule<ApplicationCommandContext> 
-    {
-        [RequireUserPermissions<ApplicationCommandContext>(Permissions.KickUsers)]
-        [SubSlashCommand("kick", "kick a user from the server")]
-        public async Task<string> Power(
-          [SubSlashCommandParameter(Name = "user", Description = "The user to kick")] GuildUser targetUser,
-          [SubSlashCommandParameter(Name = "reason", Description = "The reason for the kick")] string kickReason) {
-            string User(User? user = null)
-                {
-                    user ??= Context.User;
-                    return user.Username;
-                }
-            try {
-                await targetUser.KickAsync(new RestRequestProperties().WithAuditLogReason(kickReason));
-                return User() + " has kicked " + targetUser.Username + " for: " + kickReason;
-            } catch (Exception e) {
-                Console.WriteLine(e.Message);
-                return "Failed to kick user";
-            }
-      }
-}
-
 }
