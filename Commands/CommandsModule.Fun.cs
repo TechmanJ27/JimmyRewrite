@@ -96,11 +96,11 @@ public partial class CommandsModule
         }
     }
 
-    // public partial class GIFModule : ApplicationCommandModule<ApplicationCommandContext> 
-    // {
-    // [SubSlashCommand("boykisser", "Get a random boykisser gif")]
-    //     public static string Boykisser() {
-    //         return FetchGIF("boykisser", Context.User);
-    //     }
-    // }
+    public partial class GIFModule : ApplicationCommandModule<ApplicationCommandContext> 
+    {
+    [SubSlashCommand("boykisser", "Get a random boykisser gif")]
+        public static string Boykisser() {
+            
+        }
+    }
 }
