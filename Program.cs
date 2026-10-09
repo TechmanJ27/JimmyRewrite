@@ -1,13 +1,20 @@
-﻿using JimmyRewrite.events;
+﻿// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2026 TheMonHub
+
+using JimmyRewrite.Buttons;
+using JimmyRewrite.events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NetCord.Gateway;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Services.ApplicationCommands;
+using NetCord.Hosting.Services.ComponentInteractions;
 using CommandsModule = JimmyRewrite.Commands.CommandsModule;
 
 namespace JimmyRewrite;
+
+// TODO: Use Catbox.net library to store attachment so that they lasts forever.
 
 internal static class Program
 {
@@ -18,10 +25,11 @@ internal static class Program
         ConfigManager = builder.Configuration;
         builder.Services.AddDiscordGateway(options =>
         {
-            options.Intents = GatewayIntents.MessageContent | GatewayIntents.GuildMessages | GatewayIntents.GuildUsers;
+            options.Intents = GatewayIntents.Guilds | GatewayIntents.MessageContent | GatewayIntents.GuildMessages | GatewayIntents.GuildUsers;
         });
 
         builder.Services.AddApplicationCommands();
+        builder.Services.AddComponentInteractions();
             
         builder.Services.AddGatewayHandler<MessageDeleteHandler>();
         builder.Services.AddGatewayHandler<MessageDeleteBulkHandler>();
@@ -31,13 +39,14 @@ internal static class Program
         builder.Services.AddGatewayHandler<GuildUserRemoveHandler>();
 
         builder.Services.AddHostedService<TempBanManager>();
-        
-        Console.WriteLine(Program.ConfigManager["Discord::Token"]);
 
         var host = builder.Build();
 
         host.AddApplicationCommandModule<CommandsModule>();
         host.AddApplicationCommandModule<CommandsModule.ConfigModule>();
+        host.AddApplicationCommandModule<CommandsModule.ModModule>();
+        
+        host.AddComponentInteractionModule<ModActionConfirmModule>();
 
         await host.RunAsync();
     }

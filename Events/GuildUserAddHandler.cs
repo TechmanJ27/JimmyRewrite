@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2026 TheMonHub
+
+using System.Net;
 using NetCord;
 using NetCord.Gateway;
 using NetCord.Hosting.Gateway;
@@ -16,7 +20,7 @@ public class GuildUserAddHandler(GatewayClient client) : IGuildUserAddGatewayHan
         }
 
         var message = new MessageProperties()
-            .WithContent($"<@{arg.Id}> ({arg.Username} | {arg.Id}) joined the server");
+            .WithContent($"<@{arg.Id}> ({arg.Id}) joined the server");
 
         try
         {
@@ -24,7 +28,7 @@ public class GuildUserAddHandler(GatewayClient client) : IGuildUserAddGatewayHan
         }
         catch (RestException e)
         {
-            if (e.Error == null || e.Error.Code != 404 && e.Error.Code != 403)
+            if (e.StatusCode != HttpStatusCode.NotFound && e.StatusCode != HttpStatusCode.Forbidden)
             {
                 throw;
             }

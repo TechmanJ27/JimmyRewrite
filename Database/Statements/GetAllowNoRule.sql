@@ -1,2 +1,2 @@
-SELECT allow_custom_rule
+SELECT allow_no_rule
 FROM conf WHERE gid = @GuildId;

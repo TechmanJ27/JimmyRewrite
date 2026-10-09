@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS conf (
     mod INTEGER,
     appeal_link TEXT,
     force_note INTEGER NOT NULL DEFAULT 0,
-    allow_custom_rule INTEGER NOT NULL DEFAULT 0,
+    allow_no_rule INTEGER NOT NULL DEFAULT 0,
     mod_action_confirm INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (gid) REFERENCES guild_dat (gid) ON DELETE CASCADE
 ) STRICT;
@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS cases (
     rule_title TEXT NOT NULL,
     mod_uid INTEGER NOT NULL,
     note TEXT,
-    mod_note TEXT,
     time INTEGER NOT NULL,
     tban_expire INTEGER,
+    img TEXT,
     PRIMARY KEY (id, gid),
     FOREIGN KEY (gid) REFERENCES guild_dat (gid) ON DELETE CASCADE
 ) STRICT;

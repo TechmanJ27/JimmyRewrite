@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2026 TheMonHub
+
 using System.Collections.Concurrent;
 using NetCord.Rest;
 

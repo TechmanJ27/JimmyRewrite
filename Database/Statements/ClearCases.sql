@@ -1,0 +1,1 @@
+DELETE FROM Cases WHERE gid = @GuildId;
