@@ -61,7 +61,7 @@ public partial class CommandsModule
     }
 
     [SlashCommand("gif", "Get a random gif from the chosen category")]
-    public class GIFModule : ApplicationCommandModule<ApplicationCommandContext> (IConfiguration config)
+    public partial class GIFModule : ApplicationCommandModule<ApplicationCommandContext> (IConfiguration config)
     {
     [SubSlashCommand("cat", "Get a random cat gif")]
         public static string Cat() {
@@ -80,7 +80,7 @@ public partial class CommandsModule
         }
     }
 
-    public class GIFModule : ApplicationCommandModule<ApplicationCommandContext> 
+    public partial class GIFModule : ApplicationCommandModule<ApplicationCommandContext> 
     {
     [SubSlashCommand("dog", "Get a random dog gif")]
         public static string Dog() {
@@ -96,11 +96,11 @@ public partial class CommandsModule
         }
     }
 
-    public class GIFModule : ApplicationCommandModule<ApplicationCommandContext> 
-    {
-    [SubSlashCommand("boykisser", "Get a random boykisser gif")]
-        public static string Boykisser() {
-            return FetchGIF("boykisser", Context.User);
-        }
-    }
+    // public partial class GIFModule : ApplicationCommandModule<ApplicationCommandContext> 
+    // {
+    // [SubSlashCommand("boykisser", "Get a random boykisser gif")]
+    //     public static string Boykisser() {
+    //         return FetchGIF("boykisser", Context.User);
+    //     }
+    // }
 }
