@@ -1,4 +1,7 @@
-using NetCord;
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2026 TheMonHub
+
+using System.Net;
 using NetCord.Gateway;
 using NetCord.Hosting.Gateway;
 using NetCord.Rest;
@@ -65,7 +68,7 @@ public class MessageDeleteHandler(GatewayClient client) : IMessageDeleteGatewayH
                 .WithFields([
                     new EmbedFieldProperties()
                         .WithName("User")
-                        .WithValue($"<@{deletedMessage.Author.Id}> ({deletedMessage.Author.Username} | {deletedMessage.Author.Id})")
+                        .WithValue($"<@{deletedMessage.Author.Id}> ({deletedMessage.Author.Id})")
                         .WithInline(),
                     new EmbedFieldProperties()
                         .WithName("Link")
@@ -89,7 +92,7 @@ public class MessageDeleteHandler(GatewayClient client) : IMessageDeleteGatewayH
         }
         catch (RestException e)
         {
-            if (e.Error == null || e.Error.Code != 404 && e.Error.Code != 403)
+            if (e.StatusCode != HttpStatusCode.NotFound && e.StatusCode != HttpStatusCode.Forbidden)
             {
                 throw;
             }

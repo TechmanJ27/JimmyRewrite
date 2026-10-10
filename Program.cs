@@ -1,27 +1,35 @@
-﻿using JimmyRewrite.events;
+﻿// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2026 TheMonHub
+
+using JimmyRewrite.Buttons;
+using JimmyRewrite.events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NetCord.Gateway;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Services.ApplicationCommands;
+using NetCord.Hosting.Services.ComponentInteractions;
 using CommandsModule = JimmyRewrite.Commands.CommandsModule;
 
 namespace JimmyRewrite;
 
+// TODO: Use Catbox.net library to store attachment so that they lasts forever.
+
 internal static class Program
 {
-    public static ConfigurationManager ConfigManager = null!;
+    public static ConfigurationManager ConfigManager { get; private set; } = null!;
     public static async Task Main(string[] args)
     {
         var builder = Host.CreateApplicationBuilder(args);
         ConfigManager = builder.Configuration;
         builder.Services.AddDiscordGateway(options =>
         {
-            options.Intents = GatewayIntents.MessageContent | GatewayIntents.GuildMessages | GatewayIntents.GuildUsers;
+            options.Intents = GatewayIntents.Guilds | GatewayIntents.MessageContent | GatewayIntents.GuildMessages | GatewayIntents.GuildUsers;
         });
 
         builder.Services.AddApplicationCommands();
+        builder.Services.AddComponentInteractions();
             
         builder.Services.AddGatewayHandler<MessageDeleteHandler>();
         builder.Services.AddGatewayHandler<MessageDeleteBulkHandler>();
@@ -36,6 +44,9 @@ internal static class Program
 
         host.AddApplicationCommandModule<CommandsModule>();
         host.AddApplicationCommandModule<CommandsModule.ConfigModule>();
+        host.AddApplicationCommandModule<CommandsModule.ModModule>();
+        
+        host.AddComponentInteractionModule<ModActionConfirmModule>();
 
         await host.RunAsync();
     }

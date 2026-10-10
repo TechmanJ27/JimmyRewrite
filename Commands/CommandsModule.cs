@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2026 TheMonHub
+
 using System.Reflection;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
@@ -6,6 +9,17 @@ namespace JimmyRewrite.Commands;
 
 public partial class CommandsModule : ApplicationCommandModule<ApplicationCommandContext>
 {
+    
+    private static Task<InteractionCallbackResponse?> SendGuildOnlyError(ApplicationCommandContext context)
+    {
+        var messageProperties =
+            new InteractionMessageProperties().WithContent(":x: This command can only be used in a guild!");
+            
+        return context.Interaction.SendResponseAsync(
+            InteractionCallback.Message(messageProperties)
+        );
+    }
+    
     [SlashCommand("ping", "Ping always comes with a pong!")]
     public string Ping() => $"Pong!\n" +
                             $"-# {Math.Round(Context.Client.Latency.TotalMilliseconds)} ms";

@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2026 TheMonHub
+
+using System.Net;
 using NetCord.Gateway;
 using NetCord.Hosting.Gateway;
 using NetCord.Rest;
@@ -15,7 +19,7 @@ public class GuildUserRemoveHandler(GatewayClient client) : IGuildUserRemoveGate
         }
 
         var message = new MessageProperties()
-            .WithContent($"<@{arg.User.Id}> ({arg.User.Username} | {arg.User.Id}) left the server\n");
+            .WithContent($"<@{arg.User.Id}> ({arg.User.Id}) left the server");
 
         try
         {
@@ -23,7 +27,7 @@ public class GuildUserRemoveHandler(GatewayClient client) : IGuildUserRemoveGate
         }
         catch (RestException e)
         {
-            if (e.Error == null || e.Error.Code != 404 && e.Error.Code != 403)
+            if (e.StatusCode != HttpStatusCode.NotFound && e.StatusCode != HttpStatusCode.Forbidden)
             {
                 throw;
             }
