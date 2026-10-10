@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 TheMonHub
 
+using System.Text.Json;
 using NetCord.Services.ApplicationCommands;
 
 namespace JimmyRewrite.Commands;
 
 public partial class CommandsModule
 {
+    private static readonly HttpClient Client = new();
+    
     private enum CoinSides
     {
         Heads = 1,
@@ -61,35 +64,33 @@ public partial class CommandsModule
         }
     }
 
-    [SlashCommand("gif", "Get a random gif from the chosen category")]
-    public class GifModule : ApplicationCommandModule<ApplicationCommandContext>
-    {
-        private static readonly HttpClient Client = new();
+    [SlashCommand("cat", "Get a random cat image")]
+    public static async Task<string> Cat() {
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://beta-api.thecatapi.com/v1/images/search");
 
-        [SubSlashCommand("cat", "Get a random cat gif")]
-        public static async Task<string> Cat() {
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://beta-api.thecatapi.com/v1/images/search");
+        var catKey = Program.ConfigManager["TheCatApi:Key"];
+        request.Headers.Add("x-api-key", catKey);
 
-            var catKey = Program.ConfigManager["GIFS:cat_key"];
-            request.Headers.Add("x-api-key", catKey);
+        var response = await Client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var responseBody = await response.Content.ReadAsStringAsync();
+        using var jsonDoc = JsonDocument.Parse(responseBody);
+        var url = jsonDoc.RootElement[0].GetProperty("url").GetString();
 
-            var response = await Client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            return responseBody;
-        }
+        return url ?? throw new Exception();
+    }
         
-    [SubSlashCommand("dog", "Get a random dog gif")]
-        public static async Task<string> Dog() {
+    [SlashCommand("dog", "Get a random dog image")]
+    public static async Task<string> Dog() {
             
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://dog.ceo/api/breeds/image/random");
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://dog.ceo/api/breeds/image/random");
 
-            var response = await Client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            var responseBody = await response.Content.ReadAsStringAsync();
+        var response = await Client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var responseBody = await response.Content.ReadAsStringAsync();
+        using var jsonDoc = JsonDocument.Parse(responseBody);
+        var url = jsonDoc.RootElement.GetProperty("message").GetString();
 
-            return responseBody;
-        }
+        return url ?? throw new Exception();
     }
 }

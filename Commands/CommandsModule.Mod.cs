@@ -1,7 +1,3 @@
-using System;
-using System.Text;
-using System.Data;
-
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 TheMonHub
 
@@ -11,9 +7,6 @@ using NetCord;
 using NetCord.Rest;
 using NetCord.Services;
 using NetCord.Services.ApplicationCommands;
-using NetCord.Hosting.Gateway;
-using NetCord.Hosting.Services;
-using NetCord.Rest;
 
 namespace JimmyRewrite.Commands;
 

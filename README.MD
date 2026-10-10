@@ -5,6 +5,9 @@ Make `appsettings.json` file in the same folder as the binary and put your token
 {
   "Discord": {
     "Token": "Something something token"
+  },
+  "TheCatApi": {
+    "Key": "Something something key optional"
   }
 }
 ```
