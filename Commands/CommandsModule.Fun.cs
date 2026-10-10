@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 TheMonHub
 
+using System.Text.Json;
 using NetCord.Services.ApplicationCommands;
 
 namespace JimmyRewrite.Commands;
 
 public partial class CommandsModule
 {
+    private static readonly HttpClient Client = new();
+    
     private enum CoinSides
     {
         Heads = 1,
@@ -59,5 +62,35 @@ public partial class CommandsModule
 
             return returnValue;
         }
+    }
+
+    [SlashCommand("cat", "Get a random cat image")]
+    public static async Task<string> Cat() {
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://beta-api.thecatapi.com/v1/images/search");
+
+        var catKey = Program.ConfigManager["TheCatApi:Key"];
+        request.Headers.Add("x-api-key", catKey);
+
+        var response = await Client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var responseBody = await response.Content.ReadAsStringAsync();
+        using var jsonDoc = JsonDocument.Parse(responseBody);
+        var url = jsonDoc.RootElement[0].GetProperty("url").GetString();
+
+        return url ?? throw new Exception();
+    }
+        
+    [SlashCommand("dog", "Get a random dog image")]
+    public static async Task<string> Dog() {
+            
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://dog.ceo/api/breeds/image/random");
+
+        var response = await Client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var responseBody = await response.Content.ReadAsStringAsync();
+        using var jsonDoc = JsonDocument.Parse(responseBody);
+        var url = jsonDoc.RootElement.GetProperty("message").GetString();
+
+        return url ?? throw new Exception();
     }
 }
