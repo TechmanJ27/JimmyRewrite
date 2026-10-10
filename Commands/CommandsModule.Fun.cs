@@ -62,46 +62,34 @@ public partial class CommandsModule
     }
 
     [SlashCommand("gif", "Get a random gif from the chosen category")]
-    public partial class GIFModule : ApplicationCommandModule<ApplicationCommandContext>
+    public class GifModule : ApplicationCommandModule<ApplicationCommandContext>
     {
-    [SubSlashCommand("cat", "Get a random cat gif")]
-        public static string Cat() {
-            HttpClient = new HttpClient();
+        private static readonly HttpClient Client = new();
 
-            HttpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://beta-api.thecatapi.com/v1/images/search");
+        [SubSlashCommand("cat", "Get a random cat gif")]
+        public static async Task<string> Cat() {
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://beta-api.thecatapi.com/v1/images/search");
 
-            string cat_key = config["GIFS:cat_key"];
-            request.Headers.Add("x-api-key", cat_key);
+            var catKey = Program.ConfigManager["GIFS:cat_key"];
+            request.Headers.Add("x-api-key", catKey);
 
-            HttpResponseMessage response = await client.SendAsync(request);
+            var response = await Client.SendAsync(request);
             response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = await response.Content.ReadAsStringAsync();
 
-            return responseBody.url;
+            return responseBody;
         }
-    }
-
-    public partial class GIFModule : ApplicationCommandModule<ApplicationCommandContext> 
-    {
+        
     [SubSlashCommand("dog", "Get a random dog gif")]
-        public static string Dog() {
-            HttpClient = new HttpClient();
+        public static async Task<string> Dog() {
             
-            HttpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://dog.ceo/api/breeds/image/random");
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://dog.ceo/api/breeds/image/random");
 
-            HttpResponseMessage response = await client.SendAsync(request);
+            var response = await Client.SendAsync(request);
             response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = await response.Content.ReadAsStringAsync();
 
-            return responseBody.message;
-        }
-    }
-
-    public partial class GIFModule : ApplicationCommandModule<ApplicationCommandContext> 
-    {
-    [SubSlashCommand("boykisser", "Get a random boykisser gif")]
-        public static string Boykisser() {
-            
+            return responseBody;
         }
     }
 }

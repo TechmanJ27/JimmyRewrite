@@ -45,6 +45,7 @@ internal static class Program
         host.AddApplicationCommandModule<CommandsModule>();
         host.AddApplicationCommandModule<CommandsModule.ConfigModule>();
         host.AddApplicationCommandModule<CommandsModule.ModModule>();
+        host.AddApplicationCommandModule<CommandsModule.GifModule>();
         
         host.AddComponentInteractionModule<ModActionConfirmModule>();
 
