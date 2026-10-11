@@ -183,6 +183,17 @@ public static class ModerationHandler
     
         public static async Task<MessageProperties> GetCaseDmEmbed(Case caseData, ulong guildId, Color color, RestClient client)
     {
+        var appealLink = Database.Database.GetAppealLink(guildId);
+        ActionRowProperties? appealButton = null;
+        
+        if (appealLink != null)
+        {
+            appealButton =
+            [
+                new LinkButtonProperties(appealLink, "Appeal")
+            ];
+        }
+        
         var guild = await client.GetGuildAsync(guildId);
         List<EmbedFieldProperties> embedFields = [];
 
@@ -227,8 +238,14 @@ public static class ModerationHandler
         {
             embed.WithImage(new EmbedImageProperties(caseData.Image));
         }
+
+        var messageProperties = new MessageProperties().AddEmbeds(embed);
+        if (appealButton != null)
+        {
+            messageProperties.WithComponents([appealButton]);
+        }
         
-        return new MessageProperties().AddEmbeds(embed);
+        return messageProperties;
     }
 
     private static async Task LogCase(Case caseData, ulong guildId, Color color, RestClient client)
