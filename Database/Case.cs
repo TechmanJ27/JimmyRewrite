@@ -13,4 +13,5 @@ public record Case(
     string? Note,
     long Timestamp,
     long? TempBanExpire,
+    bool? UserDmed,
     string? Image = null);
