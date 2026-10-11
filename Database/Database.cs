@@ -306,8 +306,15 @@ public static class Database
         
         return new Case(0, userId, type, ruleIds, ruleTitle, modUid, note, time, tBanExpire, image);
     }
-    
-    // TODO: Add get cases for view cases
+
+    public static void ClearCases(ulong guildId)
+    {
+        CreateGuildDatIfNotExists(guildId);
+        using var command = GetSqliteCommand("JimmyRewrite.Database.Statements.ClearCases.sql");
+        command.Parameters.AddWithValue("GuildId", guildId);
+        command.Parameters.AddWithValue("UserId", guildId);
+        command.ExecuteNonQuery();
+    }
 
     public static List<(ulong GuildId, ulong UserId)> RemoveExpiredTBans()
     {

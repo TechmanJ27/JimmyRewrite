@@ -338,12 +338,13 @@ public partial class CommandsModule
                 [SubSlashCommand("offend_id", "Make a punishment with user ID")]
         public async Task OffendId(
             [SlashCommandParameter(Name = "user", Description = "The user to do a punishment")] ulong user,
-            [SlashCommandParameter(Name = "type", Description = "Type of the punishment")] ModerationHandler.PunishmentType type,
+            [SlashCommandParameter(Name = "type", Description = "Type of the punishment")] ModerationHandler.ParamPunishmentType typeParam,
             [SlashCommandParameter(Name = "rule", Description = "Rule that they broke (Max: 10) (Example \"1,5,6,7\")")] string rule = "0",
             [SlashCommandParameter(Name = "duration", Description = "The duration of the punishment (timeout/ban)")] string duration = "0m",
             [SlashCommandParameter(Name = "note", Description = "Additional note about the punishment (Max: 1024)")] string? note = null,
             [SlashCommandParameter(Name = "attachment", Description = "Additional image about the punishment")] Attachment? attachment = null)
         {
+            var type = ModerationHandler.GetPunishmentType(typeParam);
             if (note?.Length > 1024)
             {
                 await SendNoteLengthError(Context);
