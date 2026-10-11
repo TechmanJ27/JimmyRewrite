@@ -203,34 +203,16 @@ public static class ModerationHandler
         await BanUser(guildId, action.ModId, action.UserId, action.Rules, action.DurationMinute, action.Note, action.Image, client);
     }
 
-    /// <exception cref="NoRuleAllowedIsOff">
-    /// No rule allowed is off.
-    /// </exception>
-    /// <exception cref="InvalidRules">
-    /// Invalid rules.
-    /// </exception>
     public static async Task BanUser(ulong guildId, User mod, User user, int[] rules, long durationMinute, string? note, RestClient client)
     {
         await BanUser(guildId, mod.Id, user.Id, rules, durationMinute, note, null, client);
     }
 
-    /// <exception cref="NoRuleAllowedIsOff">
-    /// No rule allowed is off.
-    /// </exception>
-    /// <exception cref="InvalidRules">
-    /// Invalid rules.
-    /// </exception>
     public static async Task BanUser(ulong guildId, User mod, User user, int[] rules, long durationMinute, string? note, string? image, RestClient client)
     {
         await BanUser(guildId, mod.Id, user.Id, rules, durationMinute, note, image, client);
     }
 
-    /// <exception cref="NoRuleAllowedIsOff">
-    /// No rule allowed is off.
-    /// </exception>
-    /// <exception cref="InvalidRules">
-    /// Invalid rules.
-    /// </exception>
     public static async Task BanUser(ulong guildId, ulong modId, ulong userId, int[] rules, long durationMinute, string? note, string? image, RestClient client)
     {
         var isAllowedNoRule = Database.Database.GetAllowNoRule(guildId);
@@ -261,18 +243,24 @@ public static class ModerationHandler
 
         var auditLogReason = string.Join(" | ", ruleStrings);
         auditLogReason += $" | {note}";
+        
+        string? uploadedImage = null;
+        if (image != null)
+        {
+            uploadedImage = await ImageUploader.UploadFromUrl(image);
+        }
 
         if (durationMinute == 0)
         {
             Database.Database.RemoveTBan(guildId, userId);
             
-            await client.BanGuildUserAsync(
-                guildId,
-                userId,
-                0,
-                new RestRequestProperties()
-                    .WithAuditLogReason(auditLogReason)
-            );
+            // await client.BanGuildUserAsync(
+            //     guildId,
+            //     userId,
+            //     0,
+            //     new RestRequestProperties()
+            //         .WithAuditLogReason(auditLogReason)
+            // );
             
             await LogCase(Database.Database.AddCase(guildId,
                     userId,
@@ -282,7 +270,7 @@ public static class ModerationHandler
                     note,
                     startDate,
                     null,
-                    image),
+                    uploadedImage),
                 guildId,
                 Colors.Red,
                 client);
@@ -305,7 +293,7 @@ public static class ModerationHandler
                 note,
                 startDate,
                 banDuration,
-                image),
+                uploadedImage),
             guildId,
             Colors.Red,
             client);

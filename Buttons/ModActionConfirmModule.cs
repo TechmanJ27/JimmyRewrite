@@ -97,45 +97,54 @@ public class ModActionConfirmModule : ComponentInteractionModule<ComponentIntera
             return;
         }
 
-        try
-        {
-            await ModerationHandler.DoModAction(guildId, modAction, Context.Client.Rest);
-        }
-        catch (ModerationHandler.InvalidRules)
-        {
-            await Context.Interaction.SendResponseAsync(
-                InteractionCallback.Message(
-                    new InteractionMessageProperties()
-                        .WithContent(":x: Invalid rule!")
-                )
-            );
-        }
-        catch (ModerationHandler.NoRuleAllowedIsOff)
-        {
-            await Context.Interaction.SendResponseAsync(
-                InteractionCallback.Message(
-                    new InteractionMessageProperties()
-                        .WithContent(":x: Allow no rule is off!")
-                )
-            );
-            return;
-        }
-        
         await Context.Interaction.SendResponseAsync(
-            InteractionCallback.ModifyMessage(options => 
+            InteractionCallback.ModifyMessage(options =>
+            {
                 options.WithComponents([
                     new ActionRowProperties
                     {
                         new ButtonProperties("mac", "Confirmed", ButtonStyle.Primary)
                             .WithDisabled()
                     }
-                ])
-            )
+                ]);
+            })
         );
+        
+        
+        try
+        {
+            await ModerationHandler.DoModAction(guildId, modAction, Context.Client.Rest);
+        }
+        catch (ModerationHandler.InvalidRules)
+        {
+            await Context.Interaction.SendFollowupMessageAsync(
+                new InteractionMessageProperties()
+                    .WithContent(":x: Invalid rule!")
+            );
+            return;
+        }
+        catch (ModerationHandler.NoRuleAllowedIsOff)
+        {
+            await Context.Interaction.SendFollowupMessageAsync(
+                new InteractionMessageProperties()
+                    .WithContent(":x: Allow no rule is off!")
+            );
+            return;
+        }
+        catch (ImageUploader.ImageUploadFailedException)
+        {
+            await Context.Interaction.ModifyResponseAsync(options =>
+                {
+                    options.WithContent(":x: Failed to upload image!\n" +
+                                        "Consider trying again later or run the command again but without the image?");
+                }
+            );
+            return;
+        }
         
         await Context.Interaction.SendFollowupMessageAsync(
             new InteractionMessageProperties()
-                .WithContent(":white_check_mark: Moderation action confirmed!")
+                .WithContent(":white_check_mark: Done!")
         );
     }
 }
