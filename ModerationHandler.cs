@@ -20,9 +20,22 @@ public static class ModerationHandler
         Appeal = 5
     }
 
+    public enum ParamPunishmentType
+    {
+        Ban = 1,
+        Kick = 2,
+        Timeout = 3,
+        Warn = 4,
+    }
+
     public class InvalidRules : Exception;
 
     public class NoRuleAllowedIsOff : Exception;
+
+    public static PunishmentType GetPunishmentType(ParamPunishmentType paramPunishmentType)
+    {
+        return (PunishmentType)paramPunishmentType;
+    }
 
     public static string GetPunishmentTypeEd(PunishmentType type)
     {
@@ -302,12 +315,16 @@ public static class ModerationHandler
                 await BanUser(guildId, action, client);
                 break;
             case PunishmentType.Kick:
+                await KickUser(guildId, action, client);
                 break;
             case PunishmentType.Timeout:
+                await TimeoutUser(guildId, action, client);
                 break;
             case PunishmentType.Warn:
+                await WarnUser(guildId, action, client);
                 break;
             case PunishmentType.Appeal:
+                await AppealUser(guildId, action, client);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(action));
@@ -319,19 +336,9 @@ public static class ModerationHandler
     {
         if (action.Type != PunishmentType.Ban)
         {
-            return;
+            throw new ArgumentOutOfRangeException(nameof(action));
         }
         await BanUser(guildId, action.ModId, action.UserId, action.Rules, action.DurationMinute, action.Note, action.Image, client);
-    }
-
-    public static async Task BanUser(ulong guildId, User mod, User user, int[] rules, long durationMinute, string? note, RestClient client)
-    {
-        await BanUser(guildId, mod.Id, user.Id, rules, durationMinute, note, null, client);
-    }
-
-    public static async Task BanUser(ulong guildId, User mod, User user, int[] rules, long durationMinute, string? note, string? image, RestClient client)
-    {
-        await BanUser(guildId, mod.Id, user.Id, rules, durationMinute, note, image, client);
     }
 
     public static async Task BanUser(ulong guildId, ulong modId, ulong userId, int[] rules, long durationMinute, string? note, string? image, RestClient client)
@@ -375,13 +382,13 @@ public static class ModerationHandler
         {
             Database.Database.RemoveTBan(guildId, userId);
             
-            // await client.BanGuildUserAsync(
-            //     guildId,
-            //     userId,
-            //     0,
-            //     new RestRequestProperties()
-            //         .WithAuditLogReason(auditLogReason)
-            // );
+            await client.BanGuildUserAsync(
+                guildId,
+                userId,
+                0,
+                new RestRequestProperties()
+                    .WithAuditLogReason(auditLogReason)
+            );
             
             await LogCase(Database.Database.AddCase(guildId,
                     userId,
@@ -422,23 +429,202 @@ public static class ModerationHandler
             client);
     }
 
-    public static async Task KickUser(ulong guildId, User mod, User user, int[] rules, string? note, RestClient client, string? image = null)
+    public static async Task KickUser(ulong guildId, ModAction action, RestClient client)
     {
-        
+        if (action.Type != PunishmentType.Kick)
+        {
+            throw new ArgumentOutOfRangeException(nameof(action));
+        }
+        await KickUser(guildId, action.ModId, action.UserId, action.Rules, action.Note, action.Image, client);
     }
 
-    public static async Task TimeoutUser(ulong guildId, User mod, User user, int[] rules, long durationMinute, string? note, RestClient client, string? image = null)
+    public static async Task KickUser(ulong guildId, ulong modId, ulong userId, int[] rules, string? note, string? image, RestClient client)
     {
+        var isAllowedNoRule = Database.Database.GetAllowNoRule(guildId);
+        if (!isAllowedNoRule && rules.Length == 0)
+        {
+            throw new NoRuleAllowedIsOff();
+        }
         
+        var serverRulesCount = Database.Database.GetCurrentRuleId(guildId);
+        if (rules.Any(rule => rule <= 0 || rule > serverRulesCount))
+        {
+            throw new InvalidRules();
+        }
+        var startDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        
+        var serverRules = Database.Database.GetRules(guildId);
+
+        var ruleStrings = new string[rules.Length];
+        for (var i = 0; i < rules.Length; i++)
+        {
+            ruleStrings[i] = serverRules[rules[i]].Title;
+        }
+
+        var auditLogReason = string.Join(" | ", ruleStrings);
+        auditLogReason += $" | {note}";
+        
+        string? uploadedImage = null;
+        if (image != null)
+        {
+            uploadedImage = await ImageUploader.UploadFromUrl(image);
+        }
+        
+        await client.KickGuildUserAsync(
+            guildId,
+            userId,
+            new RestRequestProperties()
+                .WithAuditLogReason(auditLogReason)
+        );
+        await LogCase(Database.Database.AddCase(guildId,
+                userId,
+                PunishmentType.Kick,
+                rules,
+                modId,
+                note,
+                startDate,
+                null,
+                uploadedImage),
+            guildId,
+            Colors.Red,
+            client);
     }
     
-    public static async Task WarnUser(ulong guildId, User mod, User user, int[] rules, string? note, RestClient client, string? image = null)
+    public static async Task TimeoutUser(ulong guildId, ModAction action,
+        RestClient client)
     {
-        
+        if (action.Type != PunishmentType.Ban)
+        {
+            throw new ArgumentOutOfRangeException(nameof(action));
+        }
+        await TimeoutUser(guildId, action.ModId, action.UserId, action.Rules, action.DurationMinute, action.Note, action.Image, client);
     }
 
-    public static async Task AppealUser(ulong guildId, User mod, User user, string? note, RestClient client, string? image = null)
+    public static async Task TimeoutUser(ulong guildId, ulong modId, ulong userId, int[] rules, long durationMinute, string? note, string? image, RestClient client)
     {
+        ArgumentOutOfRangeException.ThrowIfZero(durationMinute);
+        var isAllowedNoRule = Database.Database.GetAllowNoRule(guildId);
+        if (!isAllowedNoRule && rules.Length == 0)
+        {
+            throw new NoRuleAllowedIsOff();
+        }
         
+        var serverRulesCount = Database.Database.GetCurrentRuleId(guildId);
+        if (rules.Any(rule => rule <= 0 || rule > serverRulesCount))
+        {
+            throw new InvalidRules();
+        }
+        var startDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var timeoutDuration = DateTimeOffset.UtcNow.AddMinutes(durationMinute);
+        
+        var serverRules = Database.Database.GetRules(guildId);
+
+        var ruleStrings = new string[rules.Length];
+        for (var i = 0; i < rules.Length; i++)
+        {
+            ruleStrings[i] = serverRules[rules[i]].Title;
+        }
+
+        var auditLogReason = string.Join(" | ", ruleStrings);
+        auditLogReason += $" | {note}";
+        
+        string? uploadedImage = null;
+        if (image != null)
+        {
+            uploadedImage = await ImageUploader.UploadFromUrl(image);
+        }
+        
+        var guildUser = await client.GetGuildUserAsync(
+            guildId,
+            userId
+        );
+        
+        await guildUser.TimeOutAsync(timeoutDuration, new RestRequestProperties().WithAuditLogReason(auditLogReason));
+        
+        await LogCase(Database.Database.AddCase(guildId,
+                userId,
+                PunishmentType.Timeout,
+                rules,
+                modId,
+                note,
+                startDate,
+                timeoutDuration.ToUnixTimeSeconds(),
+                uploadedImage),
+            guildId,
+            Colors.Red,
+            client);
+    }
+
+
+    public static async Task WarnUser(ulong guildId, ModAction action, RestClient client)
+    {
+        if (action.Type != PunishmentType.Warn)
+        {
+            throw new ArgumentOutOfRangeException(nameof(action));
+        }
+        await WarnUser(guildId, action.ModId, action.UserId, action.Rules, action.Note, action.Image, client);
+    }
+    
+    public static async Task WarnUser(ulong guildId, ulong modId, ulong userId, int[] rules, string? note, string? image, RestClient client)
+    {
+        var isAllowedNoRule = Database.Database.GetAllowNoRule(guildId);
+        if (!isAllowedNoRule && rules.Length == 0)
+        {
+            throw new NoRuleAllowedIsOff();
+        }
+        
+        var serverRulesCount = Database.Database.GetCurrentRuleId(guildId);
+        if (rules.Any(rule => rule <= 0 || rule > serverRulesCount))
+        {
+            throw new InvalidRules();
+        }
+        var startDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        
+        string? uploadedImage = null;
+        if (image != null)
+        {
+            uploadedImage = await ImageUploader.UploadFromUrl(image);
+        }
+        
+        await LogCase(Database.Database.AddCase(guildId,
+                userId,
+                PunishmentType.Warn,
+                rules,
+                modId,
+                note,
+                startDate,
+                null,
+                uploadedImage),
+            guildId,
+            Colors.Yellow,
+            client);
+    }
+    
+    public static async Task AppealUser(ulong guildId, ModAction action, RestClient client)
+    {
+        if (action.Type != PunishmentType.Appeal)
+        {
+            throw new ArgumentOutOfRangeException(nameof(action));
+        }
+        await AppealUser(guildId, action.ModId, action.UserId, action.Note, client);
+    }
+
+    public static async Task AppealUser(ulong guildId, ulong modId, ulong userId, string? note, RestClient client)
+    {
+        var startDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+        await client.UnbanGuildUserAsync(guildId, userId);
+        
+        await LogCase(Database.Database.AddCase(guildId,
+                userId,
+                PunishmentType.Warn,
+                [],
+                modId,
+                note,
+                startDate,
+                null),
+            guildId,
+            Colors.Green,
+            client);
     }
 }

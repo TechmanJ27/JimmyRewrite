@@ -9,6 +9,7 @@ namespace JimmyRewrite;
 public static class Colors
 {
     public static readonly Color Red = new(255, 15, 15);
+    public static readonly Color Orange = new(255, 154, 71);
     public static readonly Color Yellow = new(255, 207, 15);
     public static readonly Color Blue = new(15, 59, 255);
     public static readonly Color Green = new(128, 255, 128);
