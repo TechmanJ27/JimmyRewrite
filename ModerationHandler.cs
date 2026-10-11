@@ -181,15 +181,10 @@ public static class ModerationHandler
         return new MessageProperties().AddEmbeds(embed);
     }
     
-        public static MessageProperties GetCaseDmEmbed(Case caseData, ulong guildId, Color color)
+        public static async Task<MessageProperties> GetCaseDmEmbed(Case caseData, ulong guildId, Color color, RestClient client)
     {
-        List<EmbedFieldProperties> embedFields =
-        [
-            new EmbedFieldProperties()
-                .WithName("User")
-                .WithValue($"<@{caseData.UserId}> ({caseData.UserId})")
-                .WithInline()
-        ];
+        var guild = await client.GetGuildAsync(guildId);
+        List<EmbedFieldProperties> embedFields = [];
 
         if (caseData.RuleIds.Length > 0 && caseData.RuleTitle.Length > 0)
         {
@@ -223,7 +218,7 @@ public static class ModerationHandler
         }
         
         var embed = new EmbedProperties()
-            .WithTitle($"{caseData.Id} | Moderation Action: {caseData.PunishmentType}")
+            .WithTitle($"You have been {caseData.PunishmentType}ed In {guild.Name}")
             .WithFields(embedFields)
             .WithColor(color)
             .WithTimestamp(DateTimeOffset.FromUnixTimeSeconds(caseData.Timestamp));
@@ -243,7 +238,7 @@ public static class ModerationHandler
         var user = await client.GetUserAsync(caseData.UserId);
         var dmChannel = await user.GetDMChannelAsync();
         try {
-            await dmChannel.SendMessageAsync(GetCaseDmEmbed(caseData, guildId, color));
+            await dmChannel.SendMessageAsync(await GetCaseDmEmbed(caseData, guildId, color, client));
         }
         catch (RestException e)
         {
