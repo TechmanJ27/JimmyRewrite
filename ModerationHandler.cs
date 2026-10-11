@@ -242,7 +242,7 @@ public static class ModerationHandler
 
         embedFields.Add(new EmbedFieldProperties()
                 .WithName("User DM'd")
-                .WithValue(caseData.dmStatus)
+                .WithValue(caseData.dmSuccess)
                 .WithInline()
             );
         
@@ -274,11 +274,11 @@ public static class ModerationHandler
         var dmChannel = await user.GetDMChannelAsync();
         try {
             await dmChannel.SendMessageAsync(await GetCaseDmEmbed(caseData, guildId, color, client));
-            caseData.dmStatus = true;
+            caseData.dmSuccess = true;
         }
         catch (RestException e)
         {
-            caseData.dmStatus = false;
+            caseData.dmSuccess = false;
             if (e.StatusCode != HttpStatusCode.NotFound && e.StatusCode != HttpStatusCode.Forbidden)
             {
                 throw;
@@ -391,7 +391,7 @@ public static class ModerationHandler
                     note,
                     startDate,
                     null,
-                    dmStatus = false,
+                    dmSuccess = false,
                     uploadedImage),
                 guildId,
                 Colors.Red,
@@ -415,7 +415,7 @@ public static class ModerationHandler
                 note,
                 startDate,
                 banDuration,
-                dmStatus = false,
+                dmSuccess = false,
                 uploadedImage),
             guildId,
             Colors.Red,
