@@ -13,7 +13,6 @@ public static class ModerationHandler
 {
     public enum PunishmentType
     {
-        Unknown = 0,
         Ban = 1,
         Kick = 2,
         Timeout = 3,
@@ -24,6 +23,19 @@ public static class ModerationHandler
     public class InvalidRules : Exception;
 
     public class NoRuleAllowedIsOff : Exception;
+
+    public static string GetPunishmentTypeEd(PunishmentType type)
+    {
+        return type switch
+        {
+            PunishmentType.Ban => "Banned",
+            PunishmentType.Kick => "Kicked",
+            PunishmentType.Timeout => "Timed Out",
+            PunishmentType.Warn => "Warned",
+            PunishmentType.Appeal => "Appealed",
+            _ => "Unknown"
+        };
+    }
     
     public static async Task LogConfigChange(ulong guildId, User who, string what, string? from, string to, RestClient restClient)
     {
@@ -235,7 +247,7 @@ public static class ModerationHandler
             );
         
         var embed = new EmbedProperties()
-            .WithTitle($"You have been {caseData.PunishmentType}ed In {guild.Name}")
+            .WithTitle($"You have been {GetPunishmentTypeEd(caseData.PunishmentType)} In {guild.Name}")
             .WithFields(embedFields)
             .WithColor(color)
             .WithTimestamp(DateTimeOffset.FromUnixTimeSeconds(caseData.Timestamp));
@@ -286,8 +298,6 @@ public static class ModerationHandler
         var punishmentType = action.Type;
         switch (punishmentType)
         {
-            case PunishmentType.Unknown:
-                throw new ArgumentOutOfRangeException(nameof(action));
             case PunishmentType.Ban:
                 await BanUser(guildId, action, client);
                 break;
