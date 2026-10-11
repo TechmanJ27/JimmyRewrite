@@ -9,8 +9,6 @@ using NetCord.Rest;
 
 namespace JimmyRewrite;
 
-// TODO: Send DM to user after a punishment in LogTempUnban and LogCase
-
 public static class ModerationHandler
 {
     public enum PunishmentType
@@ -69,6 +67,29 @@ public static class ModerationHandler
 
     public static async Task LogTempUnban(ulong guildId, ulong who, RestClient client)
     {
+        var user = await client.GetUserAsync(who);
+        var dmChannel = await user.GetDMChannelAsync();
+        var guild = await client.GetGuildAsync(guildId);
+        
+        var dmEmbed = new EmbedProperties()
+            .WithTitle($"Your Temporary Ban From {guild.Name} Has Expired")
+            .WithTimestamp(DateTime.UtcNow)
+            .WithColor(Colors.Blue);
+        
+        var dmMessageProperties = new MessageProperties().AddEmbeds(dmEmbed);
+        
+        try
+        {
+            await dmChannel.SendMessageAsync(dmMessageProperties);
+        }
+        catch (RestException e)
+        {
+            if (e.StatusCode != HttpStatusCode.NotFound && e.StatusCode != HttpStatusCode.Forbidden)
+            {
+                throw;
+            }
+        }
+        
         var logModChannel = Database.Database.GetLogModChannel(guildId);
         if (logModChannel == null)
         {
@@ -87,6 +108,7 @@ public static class ModerationHandler
             .WithColor(Colors.Blue);
         
         var messageProperties = new MessageProperties().AddEmbeds(embed);
+        
         try
         {
             await client.SendMessageAsync((ulong)logModChannel, messageProperties);
@@ -158,10 +180,79 @@ public static class ModerationHandler
         
         return new MessageProperties().AddEmbeds(embed);
     }
+    
+        public static MessageProperties GetCaseDmEmbed(Case caseData, ulong guildId, Color color)
+    {
+        List<EmbedFieldProperties> embedFields =
+        [
+            new EmbedFieldProperties()
+                .WithName("User")
+                .WithValue($"<@{caseData.UserId}> ({caseData.UserId})")
+                .WithInline()
+        ];
+
+        if (caseData.RuleIds.Length > 0 && caseData.RuleTitle.Length > 0)
+        {
+            embedFields.Add(new EmbedFieldProperties()
+                .WithName("Rule IDs")
+                .WithValue(string.Join(", ", caseData.RuleIds))
+                .WithInline());
+            embedFields.Add(new EmbedFieldProperties()
+                .WithName("Rule Contents")
+                .WithValue(caseData.RuleTitle)
+                .WithInline());
+        }
+
+        if (caseData.Note != null)
+        {
+            embedFields.Add(new EmbedFieldProperties()
+                .WithName("Note")
+                .WithValue(caseData.Note));
+        }
+
+        if (caseData.TempBanExpire != null)
+        {
+            embedFields.Add(new EmbedFieldProperties()
+                .WithName("Duration")
+                .WithValue($"{TimeSpan.FromSeconds((double)(caseData.TempBanExpire - caseData.Timestamp)).Humanize()}"));
+            embedFields.Add(new EmbedFieldProperties()
+                .WithName("Expire")
+                .WithValue($"<t:{caseData.TempBanExpire}:F")
+                .WithInline()
+            );
+        }
+        
+        var embed = new EmbedProperties()
+            .WithTitle($"{caseData.Id} | Moderation Action: {caseData.PunishmentType}")
+            .WithFields(embedFields)
+            .WithColor(color)
+            .WithTimestamp(DateTimeOffset.FromUnixTimeSeconds(caseData.Timestamp));
+        
+        if (caseData.Image != null)
+        {
+            embed.WithImage(new EmbedImageProperties(caseData.Image));
+        }
+        
+        return new MessageProperties().AddEmbeds(embed);
+    }
 
     private static async Task LogCase(Case caseData, ulong guildId, Color color, RestClient client)
     {
         var logModChannel = Database.Database.GetLogModChannel(guildId);
+        
+        var user = await client.GetUserAsync(caseData.UserId);
+        var dmChannel = await user.GetDMChannelAsync();
+        try {
+            await dmChannel.SendMessageAsync(GetCaseDmEmbed(caseData, guildId, color));
+        }
+        catch (RestException e)
+        {
+            if (e.StatusCode != HttpStatusCode.NotFound && e.StatusCode != HttpStatusCode.Forbidden)
+            {
+                throw;
+            }
+        }
+        
         if (logModChannel == null)
         {
             return;
