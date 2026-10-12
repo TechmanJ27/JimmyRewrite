@@ -18,16 +18,17 @@ public class GuildUserRemoveHandler(GatewayClient client) : IGuildUserRemoveGate
             return;
         }
 
-        GetRoles(this PartialGuildUser user, RestGuild guild)
+        var rolesField = GetRoles(this PartialGuildUser arg.User, RestGuild arg.Guild)
 
-        
-         var embed = new EmbedProperties()
+        var embed = new EmbedProperties()
             .WithTitle($"<@{arg.User.Id}> ({arg.User.Id}) left the server")
             .WithFields([
                 new EmbedFieldProperties()
                     .WithName("Roles")
                     .WithValue(rolesField)
-            ]).WithTimestamp(DateTime.UtcNow);
+            ])
+            .WithFooter($"Id - {arg.User.Id}")
+            .WithTimestamp(DateTime.UtcNow);
         
         var message = new MessageProperties().AddEmbeds(embed);
 
