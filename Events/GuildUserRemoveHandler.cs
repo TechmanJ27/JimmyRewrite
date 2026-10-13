@@ -22,22 +22,13 @@ public class GuildUserRemoveHandler(GatewayClient client) : IGuildUserRemoveGate
 
         Console.WriteLine(rolesList);
 
-        public static string ReplaceLastOccurrence(string source, string find, string replace)
-        {
-            int place = source.LastIndexOf(find);
-
-            if (place == -1)
-               return source;
-
-            return source.Remove(place, find.Length).Insert(place, replace);
-        }
-
         let rolesField;
         foreach (element in rolesList) {
-            rolesField += $'<@&{element}, ';
+            rolesField += $'<@&{element}>;
+            if (rolesList.indexOf(element) != rolesList.length - 1) {
+                rolesField += ', ';
+            }
         }
-
-        rolesField = ReplaceLastOccurrence(rolesField, ', ', '');
 
         var embed = new EmbedProperties()
             .WithTitle($"<@{arg.User.Id}> left the server")
