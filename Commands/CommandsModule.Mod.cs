@@ -335,7 +335,7 @@ public partial class CommandsModule
             );
         }
         
-                [SubSlashCommand("offend_id", "Make a punishment with user ID")]
+        [SubSlashCommand("offend_id", "Make a punishment with user ID")]
         public async Task OffendId(
             [SlashCommandParameter(Name = "user", Description = "The user to do a punishment")] ulong user,
             [SlashCommandParameter(Name = "type", Description = "Type of the punishment")] ModerationHandler.ParamPunishmentType typeParam,
@@ -455,6 +455,67 @@ public partial class CommandsModule
                 }
             );
         }
+
+        [SubSlashCommand("offend_id", "Appeal a user from a ban")]
+        public async Task Appeal(
+            [SlashCommandParameter(Name = "user", Description = "The user to appeal")]
+            ulong user,
+            [SlashCommandParameter(Name = "note", Description = "Additional note about the punishment (Max: 1024)")]
+            string? note = null)
+        {
+            if (note?.Length > 1024)
+            {
+                await SendNoteLengthError(Context);
+                return;
+            }
+            
+            if (Context.Interaction.GuildId == null)
+            {
+                await SendGuildOnlyError(Context);
+                return;
+            }
+
+            var guildId = Context.Interaction.GuildId.Value;
+            
+            var requiredPerms = UserHelper.GetRequiredPermissions(ModerationHandler.PunishmentType.Appeal);
+            var hasModPerm = await UserHelper.HasPermissionsAsync(Context.User.Id, guildId, requiredPerms, Context.Client.Rest, Context.Guild);
+            var hasBotPerm = await UserHelper.HasPermissionsAsync(Context.Client.Id, guildId, requiredPerms, Context.Client.Rest, Context.Guild);
+
+            if (!hasModPerm || !hasBotPerm)
+            {
+                await SendPermLessThanError(Context);
+                return;
+            }
+
+            var actionConfirm = Database.Database.GetModActionConfirm(Context.Interaction.GuildId.Value);
+
+            var modAction = new ModAction(ModerationHandler.PunishmentType.Appeal,
+                Context.User.Id,
+                user,
+                [0],
+                0,
+                note);
+
+            if (actionConfirm)
+            {
+                await SendConfirmation(Context, modAction);
+                return;
+            }
+            
+            await Context.Interaction.SendResponseAsync(
+                InteractionCallback.DeferredMessage()
+            );
+            
+            await ModerationHandler.AppealUser(guildId, modAction, Context.Client.Rest);
+
+            await Context.Interaction.ModifyResponseAsync(options =>
+                {
+                    options.WithContent(":x: Done!");
+                }
+            );
+        }
+
         // TODO: View Cases with filter functionality, Etc
+        // TODO: Set member watch!!
     }
 }
