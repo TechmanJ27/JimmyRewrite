@@ -23,9 +23,12 @@ public class GuildUserRemoveHandler(GatewayClient client) : IGuildUserRemoveGate
         Console.WriteLine(rolesList);
 
         let rolesField;
+        if (rolesList is List<T>) {
+            rolesList = rolesList.ToArray();
+        }
         foreach (element in rolesList) {
             rolesField += $'<@&{element}>;
-            if (rolesList.indexOf(element) != rolesList.length - 1) {
+            if (rolesList.indexOf(element) != rolesList.Length - 1) {
                 rolesField += ', ';
             }
         }
